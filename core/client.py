@@ -26,7 +26,7 @@ class ClientHandle(object):
         config_last_update_time = 0     # 配置监控配置更新的时间，第一次运行初始化时间为0
         while not exit_flag:
             if time.time() - config_last_update_time > settings.CONFIG_UPDATE_INTERVAL:     # 当前时间减上次更新配置时间大于配置文件中设置的监控配置更新间隔
-                latest_configs = self.load_latest_config()   # 获取最新的监控配置信息, {'application': {'LinuxNetwork': ['LinuxNetworkPlugin', 60], 'LinuxCpu': ['LinuxCpuPlugin', 30], 'LinuxMemory': ['LinuxMemoryPlugin', 60], 'LinuxLoad': ['LinuxLoadPlugin', 60]}}
+                latest_configs = self.get_latest_config()   # 获取最新的监控配置信息, {'application': {'LinuxNetwork': ['LinuxNetworkPlugin', 60], 'LinuxCpu': ['LinuxCpuPlugin', 30], 'LinuxMemory': ['LinuxMemoryPlugin', 60], 'LinuxLoad': ['LinuxLoadPlugin', 60]}}
                 print('加载最新配置--->', latest_configs)
                 self.monitored_services.update(latest_configs)  # 更新已监控的服务字典
                 print('已监控的服务--->', self.monitored_services)
@@ -46,13 +46,23 @@ class ClientHandle(object):
                     print('开始监控[%s]服务，还差%s秒' % (application_name, monitor_interval - (time.time() - last_invoke_time)))
             time.sleep(1)
 
-    def load_latest_config(self):
+    def get_latest_config(self):
         """获取最新的监控配置信息"""
         try:
             headers = {}
             headers.update(self.auth_key())
             data = {'hostname': self.hostname}
             response = requests.get(url=self.config_api, params=data, headers=headers)
+        except Exception as e:
+            response = str(e)
+        return response.json()
+
+    def post_data(self, data):
+        """向服务器提交监控数据"""
+        try:
+            headers = {}
+            headers.update(self.auth_key())
+            response = requests.post(url=self.data_api, json=json.dumps(data), headers=headers)
         except Exception as e:
             response = str(e)
         return response.json()
@@ -73,5 +83,11 @@ class ClientHandle(object):
         if hasattr(plugin_map, plugin_name):
             func = getattr(plugin_map, plugin_name)
             plugin_callback = func()
+            data = {
+                'hostname': self.hostname,
+                'application_name': application_name,
+                'value': json.dumps(plugin_callback)
+            }
+            response = self.post_data(data)
         else:
             print("\033[31;1m没有在plugin_map中找到应用集[%s]插件名为[%s]的函数\033[0m" % (application_name, plugin_name))

@@ -12,11 +12,11 @@ def monitor():
         value_dict = {'status': status}
     else:
         result = result.split()[-3:]
-        load1, load5, load15 = result.split(',')
+        load1, load5, load15 = result
         value_dict = {
-            'load1': float(load1),
-            'load5': float(load5),
-            'load15': float(load15),
+            'load1': float(load1.strip(',')),
+            'load5': float(load5.strip(',')),
+            'load15': float(load15.strip(',')),
             'status': status
         }
     return value_dict
