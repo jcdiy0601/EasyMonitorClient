@@ -5,6 +5,7 @@ import subprocess
 
 
 def monitor():
+    """监控cpu"""
     shell_command = '/usr/bin/sar 1 3 | grep "Average\|平均时间"'
     status, result = subprocess.getstatusoutput(cmd=shell_command)
     if status != 0:
