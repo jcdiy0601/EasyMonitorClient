@@ -33,7 +33,6 @@ REQUEST_TIME_OUT = 30
 # 监控配置更新间隔，秒
 CONFIG_UPDATE_INTERVAL = 300
 
-
 """
 code:
 - 200 一切正常;
