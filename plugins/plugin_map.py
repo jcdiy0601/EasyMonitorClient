@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # Author: 'JiaChen'
 
-from plugins.linux import cpu, load, memory, network
+from plugins.linux import cpu, load, network, memory
+
 # 此文件中的函数名要与数据库中应用集的插件名一致
 
 

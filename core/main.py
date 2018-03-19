@@ -2,6 +2,7 @@
 # Author: 'JiaChen'
 
 from core import client
+from lib.log import Logger
 
 
 class CommandHandle(object):
@@ -32,9 +33,10 @@ class CommandHandle(object):
     @staticmethod
     def start():
         """启动监控客户端"""
+        Logger().log(message='客户端已启动', mode=True)
         client_obj = client.ClientHandle()
         client_obj.forever_run()
 
     def stop(self):
         """关闭监控客户端"""
-        pass
+        Logger().log(message='客户端已关闭', mode=False)

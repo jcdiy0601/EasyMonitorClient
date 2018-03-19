@@ -15,7 +15,7 @@ class Logger(object):
         self.run_logger = None
         self.error_logger = None
         self.initialize_run_log()
-        self.initialize_run_log()
+        self.initialize_error_log()
 
     @staticmethod
     def check_path_exist(log_abs_file):
