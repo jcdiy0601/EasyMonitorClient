@@ -28,7 +28,7 @@ class CommandHandle(object):
         start 启动监控客户端
         stop  关闭监控客户端
         '''
-        exit(valid_commands)
+        exit(valid_commands)    # 输出提示信息，并退出程序
 
     @staticmethod
     def start():

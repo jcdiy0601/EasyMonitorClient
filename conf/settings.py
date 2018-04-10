@@ -10,10 +10,10 @@ BASEDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOSTNAME = 'CentOS-02_172.16.99.24'
 
 # 获取配置API
-CONFIG_API = 'http://10.10.50.196:8000/monitor_api/v1/config'
+CONFIG_API = 'http://10.10.30.93:8000/monitor_api/v1/config'
 
 # 提交数据API
-DATA_API = 'http://10.10.50.196:8000/monitor_api/v1/data'
+DATA_API = 'http://10.10.30.93:8000/monitor_api/v1/data'
 
 # 用于API认证的KEY
 KEY = '299095cc-1330-11e5-b06a-a45e60bec08b'

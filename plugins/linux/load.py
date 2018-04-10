@@ -23,3 +23,5 @@ def monitor():
 
 if __name__ == '__main__':
     print(monitor())
+    # {'status': 0, 'load1': 0.05, 'load5': 0.04, 'load15': 0.05}
+

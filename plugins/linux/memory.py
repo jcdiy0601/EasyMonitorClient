@@ -29,16 +29,15 @@ def monitor():
             value = int(i.split()[1])
             value_dict[key] = value
 
-        # {'SwapFree': 2031592, 'SwapTotal': 2031612, 'Cached': 154364, 'status': 0, 'Buffers': 51728, 'MemFree': 172208, 'MemTotal': 493952}
-
         if monitor_dict['SwapUsage'] == 'percentage':
             value_dict['SwapUsage'] = value_dict['SwapTotal'] - value_dict['SwapFree']
-            value_dict['SwapUsage_p'] = float(value_dict['SwapUsage'] / value_dict['SwapTotal'] * 100)
+            value_dict['SwapUsage_p'] = round(float(value_dict['SwapUsage'] / value_dict['SwapTotal'] * 100), 2)
 
         if monitor_dict['MemUsage'] == 'percentage':
             value_dict['MemUsage'] = value_dict['MemTotal'] - value_dict['MemFree'] - value_dict['Cached'] - value_dict['Buffers']
-            value_dict['MemUsage_p'] = float(value_dict['MemUsage'] / value_dict['MemTotal'] * 100)
+            value_dict['MemUsage_p'] = round(float(value_dict['MemUsage'] / value_dict['MemTotal'] * 100), 2)
     return value_dict
 
 if __name__ == '__main__':
     print(monitor())
+    # {'Buffers': 59048, 'MemUsage': 112712, 'SwapUsage': 20, 'SwapUsage_p': 0.0, 'status': 0, 'SwapFree': 2031592, 'MemTotal': 493952, 'MemFree': 165884, 'SwapTotal': 2031612, 'Cached': 156308, 'MemUsage_p': 22.82}

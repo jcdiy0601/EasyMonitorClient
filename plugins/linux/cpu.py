@@ -26,3 +26,4 @@ def monitor():
 
 if __name__ == '__main__':
     print(monitor())
+    # {'system': 0.67, 'idle': 99.33, 'status': 0, 'iowait': 0.0, 'user': 0.0}
