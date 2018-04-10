@@ -14,7 +14,6 @@ import sys
 import atexit
 import subprocess
 from signal import SIGTERM
-import time
 
 
 class ClientHandle(object):
@@ -119,8 +118,6 @@ class ClientHandle(object):
                         t = threading.Thread(target=self.invoke_plugin, args=(application_name, value))
                         t.start()
                         Logger().log(message='开始监控[%s]服务' % application_name, mode=True)
-                     # else:
-                     #     print('开始监控[%s]服务，还差%s秒' % (application_name, monitor_interval - (time.time() - last_invoke_time)))
                 time.sleep(1)
 
     def get_latest_config(self):

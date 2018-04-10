@@ -25,6 +25,7 @@ class CommandHandle(object):
     def help_message():
         """帮助信息"""
         valid_commands = '''
+执行监控启动程序需要在其后输入相关参数：
         start  启动监控客户端
         stop   关闭监控客户端
         status 监控客户端状态
