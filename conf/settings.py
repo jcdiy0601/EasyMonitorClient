@@ -22,16 +22,19 @@ KEY = '299095cc-1330-11e5-b06a-a45e60bec08b'
 AUTH_KEY_NAME = 'monitor-api-auth-key'
 
 # 错误日志
-ERROR_LOG_FILE = os.path.join(BASEDIR, "logs", 'error.log')
+ERROR_LOG_FILE = os.path.join(BASEDIR, 'logs', 'error.log')
 
 # 运行日志
-RUN_LOG_FILE = os.path.join(BASEDIR, "logs", 'run.log')
+RUN_LOG_FILE = os.path.join(BASEDIR, 'logs', 'run.log')
 
 # 超时时间，秒
 REQUEST_TIME_OUT = 30
 
 # 监控配置更新间隔，秒
 CONFIG_UPDATE_INTERVAL = 300
+
+# PID文件存放路径
+PID_FILE = os.path.join(BASEDIR, 'conf', 'monitor.pid')
 
 """
 code:

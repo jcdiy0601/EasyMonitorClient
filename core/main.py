@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Author: 'JiaChen'
 
-from core import client
+from core.client import ClientHandle
 from lib.log import Logger
 
 
@@ -9,7 +9,7 @@ class CommandHandle(object):
     """命令处理"""
     def __init__(self, sys_args):
         self.sys_args = sys_args
-        if len(self.sys_args) < 2:  # 没有输入参数
+        if len(self.sys_args) != 2:  # 输入参数数量不正确
             self.help_message()
         self.command_check()
 
@@ -25,18 +25,26 @@ class CommandHandle(object):
     def help_message():
         """帮助信息"""
         valid_commands = '''
-        start 启动监控客户端
-        stop  关闭监控客户端
+        start  启动监控客户端
+        stop   关闭监控客户端
+        status 监控客户端状态
         '''
         exit(valid_commands)    # 输出提示信息，并退出程序
 
     @staticmethod
     def start():
         """启动监控客户端"""
-        Logger().log(message='客户端已启动', mode=True)
-        client_obj = client.ClientHandle()
-        client_obj.forever_run()
+        Logger().log(message='启动监控客户端', mode=True)
+        client_obj = ClientHandle()
+        client_obj.start_daemonize()
 
     def stop(self):
         """关闭监控客户端"""
-        Logger().log(message='客户端已关闭', mode=False)
+        Logger().log(message='关闭监控客户端', mode=True)
+        client_obj = ClientHandle()
+        client_obj.stop_daemonize()
+
+    def status(self):
+        """监控客户端状态"""
+        client_obj = ClientHandle()
+        client_obj.status_daemonize()

@@ -9,17 +9,81 @@ import json
 import threading
 from plugins import plugin_map
 from lib.log import Logger
+import os
+import sys
+import atexit
+import subprocess
+from signal import SIGTERM
+import time
 
 
 class ClientHandle(object):
     """客户端处理"""
     def __init__(self):
         self.config_api = settings.CONFIG_API   # 获取监控配置api
-        self.data_api = settings.DATA_API   # 提交监控数据api
+        self.data_api = settings.DATA_API   # 获取提交监控数据api
         self.key = settings.KEY     # key
         self.key_name = settings.AUTH_KEY_NAME  # key_name
         self.hostname = settings.HOSTNAME   # 主机名
         self.monitored_services = {}    # 已监控的服务
+        self.pid_file = settings.PID_FILE   # PID文件
+
+    def start_daemonize(self):
+        """启动守护进程"""
+        print('启动监控客户端...')
+        time.sleep(1)
+        pid = os.fork()
+        # 父进程(会话组头领进程)退出，这意味着一个非会话组头领进程永远不能重新获得控制终端
+        if pid > 0:
+            sys.exit(0)     # 父进程退出
+        # 从母体环境脱离
+        os.chdir('/')   # chdir确认进程不保持任何目录于使用状态，否则不能umount一个文件系统，也可以改变到对于守护程序运行重要的文件所在目录
+        os.umask(0)     # 调用umask(0)以便拥有对于写的任何东西的完全控制，因为有时不知道继承了什么样的umask
+        os.setsid()     # setsid调用成功后，进程成为新的会话组长和新的进程组长，并与原来的登录会话和进程组脱离
+        # 执行第二次fork
+        pid = os.fork()
+        if pid > 0:
+            sys.exit(0)     # 第二个父进程退出
+        # 进程已经是守护进程了，重定向标准文件描述符
+        sys.stdout.flush()
+        sys.stderr.flush()
+        # dup2函数原子化地关闭和复制文件描述符，重定向到 / dev / nul，即丢弃所有输入输出
+        with open('/dev/null') as read_null, open('/dev/null', 'w') as write_null:
+            os.dup2(read_null.fileno(), sys.stdin.fileno())
+            os.dup2(write_null.fileno(), sys.stdout.fileno())
+            os.dup2(write_null.fileno(), sys.stderr.fileno())
+        # 写入pid文件
+        with open(self.pid_file, 'w') as f:
+            f.write(str(os.getpid()))
+        # 开始循环
+        self.forever_run()
+
+    def stop_daemonize(self):
+        """关闭守护进程"""
+        try:
+            with open(self.pid_file, 'r') as f:
+                pid = int(f.read().strip())
+                os.kill(pid, SIGTERM)
+        except Exception as e:
+            print('监控客户端未启动')
+            sys.exit(1)
+        atexit.register(os.remove, self.pid_file)
+        print('关闭监控客户端...')
+        time.sleep(1)
+
+    def status_daemonize(self):
+        """守护进程状态"""
+        if os.path.isfile(self.pid_file):
+            with open(self.pid_file, 'r') as f:
+                pid = f.read().strip()
+                shell_command = 'ps -ef | grep -v grep | grep %s' % pid
+                result = subprocess.getoutput(shell_command)
+                if result:
+                    print('监控客户端运行中...')
+                else:
+                    print('监控客户端已关闭...')
+        else:
+            print('监控客户端未启动...')
 
     def forever_run(self):
         """永久启动客户端监控"""
@@ -55,8 +119,8 @@ class ClientHandle(object):
                         t = threading.Thread(target=self.invoke_plugin, args=(application_name, value))
                         t.start()
                         Logger().log(message='开始监控[%s]服务' % application_name, mode=True)
-            #         else:
-            #             print('开始监控[%s]服务，还差%s秒' % (application_name, monitor_interval - (time.time() - last_invoke_time)))
+                     # else:
+                     #     print('开始监控[%s]服务，还差%s秒' % (application_name, monitor_interval - (time.time() - last_invoke_time)))
                 time.sleep(1)
 
     def get_latest_config(self):
