@@ -179,10 +179,12 @@ class ClientHandle(object):
         if status:
             response = response.json()
             if response['code'] == 401:
-                Logger().log(message='API认证未通过', mode=False)
+                Logger().log(message=response['message'], mode=False)
             elif response['code'] == 404:
                 Logger().log(message='资源不存在,%s' % self.hostname, mode=False)
             elif response['code'] == 200:
                 Logger().log(message='监控数据发送成功,%s' % data, mode=True)
+            elif response['code'] == 422:
+                Logger().log(message=response['message'], mode=False)
         else:
             Logger().log(message='请求发送监控数据API接口失败,%s' % response, mode=False)
