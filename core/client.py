@@ -95,10 +95,10 @@ class ClientHandle(object):
                     Logger().log(message='请求获取监控配置API接口失败,%s' % latest_configs['message'], mode=False)
                     time.sleep(60)
                 elif latest_configs['code'] == 401:  # api认证失败
-                    Logger().log(message='API认证未通过', mode=False)
+                    Logger().log(message=latest_configs['message'], mode=False)
                     time.sleep(60)
                 elif latest_configs['code'] == 404:  # 资源不存在
-                    Logger().log(message='资源不存在,%s' % self.hostname, mode=False)
+                    Logger().log(message=latest_configs['message'], mode=False)
                     time.sleep(60)
                 elif latest_configs['code'] == 200:  # 获取最新监控配置成功
                     Logger().log(message=latest_configs['message'], mode=True)
@@ -181,7 +181,7 @@ class ClientHandle(object):
             if response['code'] == 401:
                 Logger().log(message=response['message'], mode=False)
             elif response['code'] == 404:
-                Logger().log(message='资源不存在,%s' % self.hostname, mode=False)
+                Logger().log(message=response['message'], mode=False)
             elif response['code'] == 200:
                 Logger().log(message='监控数据发送成功,%s' % data, mode=True)
             elif response['code'] == 422:
