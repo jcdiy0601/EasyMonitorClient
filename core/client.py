@@ -139,7 +139,7 @@ class ClientHandle(object):
             headers = {}
             headers.update(self.auth_key())     # 生成api认证的主机头信息
             Logger().log(message='发送监控数据,%s' % data, mode=True)
-            response = requests.post(url=self.data_api, json=json.dumps(data), headers=headers)
+            response = requests.post(url=self.data_api, json=data, headers=headers)
         except Exception as e:
             response = str(e)
             status = False
