@@ -186,5 +186,8 @@ class ClientHandle(object):
                 Logger().log(message=response['message'], mode=True)
             elif response['code'] == 422:
                 Logger().log(message=response['message'], mode=False)
+            elif response['code'] == 500:
+                Logger().log(message=response['message'], mode=False)
+
         else:
             Logger().log(message='请求发送监控数据API接口失败,%s' % response, mode=False)
