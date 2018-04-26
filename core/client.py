@@ -25,9 +25,9 @@ class ClientHandle(object):
         self.key_name = settings.AUTH_KEY_NAME  # key_name
         self.hostname = settings.HOSTNAME   # 主机名
         self.monitored_applications = {}    # 已监控的应用集
-        self.pid_file = settings.PID_FILE   # PID文件
+        self.pid_file = settings.PID_FILE   # PID文件存放路径
 
-    def start_daemonize(self):
+    def start(self):
         """启动守护进程"""
         print('启动监控客户端...')
         time.sleep(1)
@@ -46,7 +46,7 @@ class ClientHandle(object):
         # 进程已经是守护进程了，重定向标准文件描述符
         sys.stdout.flush()
         sys.stderr.flush()
-        # dup2函数原子化地关闭和复制文件描述符，重定向到 / dev / nul，即丢弃所有输入输出
+        # dup2函数原子化地关闭和复制文件描述符，重定向到/dev/nul，即丢弃所有输入输出
         with open('/dev/null') as read_null, open('/dev/null', 'w') as write_null:
             os.dup2(read_null.fileno(), sys.stdin.fileno())
             os.dup2(write_null.fileno(), sys.stdout.fileno())
@@ -57,20 +57,20 @@ class ClientHandle(object):
         # 开始循环
         self.forever_run()
 
-    def stop_daemonize(self):
+    def stop(self):
         """关闭守护进程"""
         try:
             with open(self.pid_file, 'r') as f:
                 pid = int(f.read().strip())
                 os.kill(pid, SIGTERM)
         except Exception as e:
-            print('监控客户端未启动')
+            print('监控客户端未启动...')
             sys.exit(1)
         atexit.register(os.remove, self.pid_file)
         print('关闭监控客户端...')
         time.sleep(1)
 
-    def status_daemonize(self):
+    def status(self):
         """守护进程状态"""
         if os.path.isfile(self.pid_file):
             with open(self.pid_file, 'r') as f:
@@ -79,8 +79,6 @@ class ClientHandle(object):
                 result = subprocess.getoutput(shell_command)
                 if result:
                     print('监控客户端运行中...')
-                else:
-                    print('监控客户端已关闭...')
         else:
             print('监控客户端未启动...')
 
@@ -90,7 +88,7 @@ class ClientHandle(object):
         config_last_update_time = 0     # 初始化监控配置更新的时间，第一次运行初始化时间为0
         while not exit_flag:
             if time.time() - config_last_update_time > settings.CONFIG_UPDATE_INTERVAL:     # 当前时间减上次更新配置时间大于配置文件中设置的监控配置更新间隔
-                latest_configs = self.get_latest_config()   # 获取最新的监控配置信息, {'application': {'LinuxCpu': ['LinuxCpuPlugin', 30], 'LinuxLoad': ['LinuxLoadPlugin', 60], 'code': xxx, 'message': xxx}
+                latest_configs = self.get_latest_config()   # 获取最新的监控配置信息, {'application': {'LinuxCpu': ['LinuxCpuPlugin', 30], 'LinuxLoad': ['LinuxLoadPlugin', 60]}, 'code': xxx, 'message': xxx}
                 if latest_configs['code'] == 400:    # 请求api接口失败
                     Logger().log(message='请求获取监控配置API接口失败,%s' % latest_configs['message'], mode=False)
                     time.sleep(60)
@@ -117,7 +115,7 @@ class ClientHandle(object):
                         self.monitored_applications[application_name][2] = time.time()
                         t = threading.Thread(target=self.invoke_plugin, args=(application_name, value))
                         t.start()
-                        Logger().log(message='开始监控[%s]服务' % application_name, mode=True)
+                        Logger().log(message='开始监控[%s]应用集' % application_name, mode=True)
                 time.sleep(1)
 
     def get_latest_config(self):
