@@ -24,7 +24,7 @@ class ClientHandle(object):
         self.key = settings.KEY     # key
         self.key_name = settings.AUTH_KEY_NAME  # key_name
         self.hostname = settings.HOSTNAME   # 主机名
-        self.monitored_services = {}    # 已监控的服务
+        self.monitored_applications = {}    # 已监控的应用集
         self.pid_file = settings.PID_FILE   # PID文件
 
     def start_daemonize(self):
@@ -102,19 +102,19 @@ class ClientHandle(object):
                     time.sleep(60)
                 elif latest_configs['code'] == 200:  # 获取最新监控配置成功
                     Logger().log(message=latest_configs['message'], mode=True)
-                    self.monitored_services.update(latest_configs['application'])  # 更新已监控的服务字典
-                    Logger().log(message='更新监控配置,%s' % self.monitored_services, mode=True)
+                    self.monitored_applications.update(latest_configs['application'])  # 更新已监控的应用集字典
+                    Logger().log(message='更新监控配置,%s' % self.monitored_applications, mode=True)
                     config_last_update_time = time.time()   # 重新设置监控配置更新时间
-            if self.monitored_services:
+            if self.monitored_applications:
                 # {'LinuxCpu': ['LinuxCpuPlugin', 30], 'LinuxNetwork': ['LinuxNetworkPlugin', 60], 'LinuxLoad': ['LinuxLoadPlugin', 60], 'LinuxMemory': ['LinuxMemoryPlugin', 60]}
                 # 开始监控服务
-                for application_name, value in self.monitored_services.items():
+                for application_name, value in self.monitored_applications.items():
                     if len(value) == 2:     # 第一次监控,给值[列表]中添加时间
-                        self.monitored_services[application_name].append(0)
+                        self.monitored_applications[application_name].append(0)
                     monitor_interval = value[1]  # 获取监控间隔
                     last_invoke_time = value[2]  # 获取监控调用的最后一次时间
                     if time.time() - last_invoke_time > monitor_interval:   # 如果时间大于监控间隔则需要去跑插件了
-                        self.monitored_services[application_name][2] = time.time()
+                        self.monitored_applications[application_name][2] = time.time()
                         t = threading.Thread(target=self.invoke_plugin, args=(application_name, value))
                         t.start()
                         Logger().log(message='开始监控[%s]服务' % application_name, mode=True)
