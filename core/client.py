@@ -115,7 +115,7 @@ class ClientHandle(object):
                         self.monitored_applications[application_name][2] = time.time()
                         t = threading.Thread(target=self.invoke_plugin, args=(application_name, value))
                         t.start()
-                        Logger().log(message='开始监控[%s]应用集' % application_name, mode=True)
+                        Logger().log(message='开始监控应用集,%s' % application_name, mode=True)
                 time.sleep(1)
 
     def get_latest_config(self):
@@ -170,7 +170,7 @@ class ClientHandle(object):
             }
             self.post_data(data=report_data, callback=self.call_back)
         else:
-            Logger().log(message='plugin_map中未找到应用集插件,%s-%s' % (application_name, plugin_name), mode=False)
+            Logger().log(message='plugin_map中未找到应用集插件,%s,%s' % (application_name, plugin_name), mode=False)
 
     def call_back(self, data, status, response):
         """监控数据提交后回调函数"""
