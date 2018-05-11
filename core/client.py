@@ -5,7 +5,6 @@ from conf import settings
 import time
 import hashlib
 import requests
-import json
 import threading
 from plugins import plugin_map
 from lib.log import Logger
@@ -100,7 +99,7 @@ class ClientHandle(object):
                     time.sleep(60)
                 elif latest_configs['code'] == 200:  # 获取最新监控配置成功
                     Logger().log(message=latest_configs['message'], mode=True)
-                    self.monitored_applications.update(latest_configs['application'])  # 更新已监控的应用集字典
+                    self.monitored_applications.update(latest_configs['data'])  # 更新已监控的应用集字典
                     Logger().log(message='更新监控配置,%s' % self.monitored_applications, mode=True)
                     config_last_update_time = time.time()   # 重新设置监控配置更新时间
             if self.monitored_applications:
