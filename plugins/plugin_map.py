@@ -28,8 +28,3 @@ def LinuxNetworkPlugin():
 def LinuxDiskPlugin():
     """Linux系统硬盘监控插件"""
     return disk.monitor()
-
-
-def AgentPingPlugin():
-    """"""
-    pass
